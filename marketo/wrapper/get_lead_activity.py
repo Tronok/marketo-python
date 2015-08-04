@@ -1,6 +1,9 @@
 
 import xml.etree.ElementTree as ET
 import lead_activity
+# import sys
+# reload(sys)
+# sys.setdefaultencoding('utf8')
 
 
 def wrap(email=None):
@@ -15,7 +18,7 @@ def wrap(email=None):
 
 def unwrap(response):
     print response
-    root = ET.fromstring(response.decode("utf-8"))
+    root = ET.fromstring(response.text.decode("utf-8"))
     activities = []
     for activity_el in root.findall('.//activityRecord'):
         activity = lead_activity.unwrap(activity_el)
