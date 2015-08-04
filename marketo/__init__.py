@@ -51,9 +51,6 @@ class Client:
                 'Soapaction': '',
                 'Content-Type': 'text/xml;charset=UTF-8',
                 'Accept': '*/*'})
-        print "response.encoding: ", response.encoding
-        response.encoding='utf-8'
-        print "response.encoding: ", response.encoding
 
         return response
 

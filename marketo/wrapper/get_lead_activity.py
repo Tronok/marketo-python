@@ -17,8 +17,9 @@ def wrap(email=None):
 
 
 def unwrap(response):
-    print response
-    root = ET.fromstring(response.text)
+    t = response.text
+    print t
+    root = ET.fromstring(t)
     activities = []
     for activity_el in root.findall('.//activityRecord'):
         activity = lead_activity.unwrap(activity_el)
