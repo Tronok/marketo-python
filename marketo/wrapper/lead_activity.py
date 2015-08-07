@@ -18,8 +18,11 @@ class LeadActivity:
 def unwrap(xml):
     activity = LeadActivity()
     activity.id = xml.find('id').text
-    activity.timestamp = iso8601.parse_date(xml.find('activityDateTime').text)
+    activity.timestamp = (iso8601.parse_date(xml.find('activityDateTime').text)).strftime("%d-%b-%Y %H:%m")
     activity.type = xml.find('activityType').text
+    activity.assetname = xml.find('mktgAssetName').text
+    activity.campaign = xml.find('campaign').text
+
 
     for attribute in xml.findall('.//attribute'):
         name = attribute.find('attrName').text
