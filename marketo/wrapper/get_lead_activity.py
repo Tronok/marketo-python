@@ -10,12 +10,12 @@ import lead_activity
 # and
 # http://app.marketo.com/soap/mktows/2_2?WSDL
 
-def wrap(email=None, filters=[]):
+def wrap(keytype=None, key=None, filters=[]):
     head = ('<ns1:paramsGetLeadActivity>' +
                 '<leadKey>' +
-                    '<keyType>EMAIL</keyType>' +
+                    '<keyType>'+keytype+'</keyType>' +
                         '<keyValue>')
-    head += email + '</keyValue></leadKey>'
+    head += key + '</keyValue></leadKey>'
 
     tail = '</ns1:paramsGetLeadActivity>'
 
