@@ -66,12 +66,12 @@ class Client:
         else:
             raise Exception(response.text)
 
-    def get_lead_activity(self, email=None, filters=[]):
+    def get_lead_activity(self, keytype=None, key=None, filters=[]):
 
-        if not email or not isinstance(email, (str, unicode)):
+        if not keytype or not isinstance(keytype, (str, unicode)):
             raise ValueError('Must supply an email as a non empty string.')
 
-        body = get_lead_activity.wrap(email, filters)
+        body = get_lead_activity.wrap(keytype, key, filters)
         response = self.request(body)
         if response.status_code == 200:
             return get_lead_activity.unwrap(response)
