@@ -13,8 +13,8 @@ def header(user_id, encryption_key):
     timestamp = rfc3339(datetime.datetime.now())
     signature = sign(timestamp + user_id, encryption_key)
     return (
-        '<env:Header><ns1:AuthenticationHeader>' +
+        '<SOAP-ENV:Header><ns1:AuthenticationHeader>' +
               '<mktowsUserId>' + user_id + '</mktowsUserId>' +
               '<requestSignature>' + signature + '</requestSignature>' +
               '<requestTimestamp>' + timestamp + '</requestTimestamp>' +
-        '</ns1:AuthenticationHeader></env:Header>')
+        '</ns1:AuthenticationHeader></SOAP-ENV:Header>')
