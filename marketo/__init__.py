@@ -1,4 +1,5 @@
 import datetime
+from collections import namedtuple
 
 import version
 
@@ -8,7 +9,8 @@ __version__ = VERSION
 import requests
 import auth
 
-from marketo.wrapper import get_lead, get_lead_activity, request_campaign, sync_lead, get_multiple_leads
+from marketo.wrapper import get_lead, get_lead_activity, request_campaign, \
+    sync_lead, get_multiple_leads, get_lead_changes
 
 
 class Client:
@@ -50,6 +52,26 @@ class Client:
                 'Accept': '*/*'})
 
         return response
+
+    def get_lead_changes(self, oldest_created_at, latest_created_at):
+        if not oldest_created_at or not isinstance(oldest_created_at, datetime.datetime):
+            raise ValueError('Must supply oldest_created_at as a datetime object')
+        if not latest_created_at and not isinstance(latest_created_at, datetime.datetime):
+            raise ValueError('Must supply latest_created_at as a datetime object')
+        all_activities = []
+        remaining_count = 1
+        new_stream_position = namedtuple('newStreamPosition', ['latest_created_at', 'oldest_created_at', 'offset'])
+        stream_position = new_stream_position(latest_created_at, oldest_created_at, False)
+        while remaining_count:
+            body = get_lead_changes.wrap(oldest_created_at=stream_position.oldest_created_at,
+                                         latest_created_at=stream_position.latest_created_at,
+                                         offset=stream_position.offset)
+            response = self.request(body)
+            if response.status_code == 200:
+                stream_position, remaining_count, activities = get_lead_changes.unwrap(response, new_stream_position)
+                all_activities.extend(activities)
+            else:
+                raise Exception(response.text)
 
     def get_multiple_leads_last_update_selector(self,
                                                 oldest_updated_at,
