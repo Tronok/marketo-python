@@ -1,5 +1,3 @@
-
-
 class LeadRecord:
 
     def __init__(self):
@@ -10,6 +8,12 @@ class LeadRecord:
 
     def __repr__(self):
         return self.__str__()
+
+    def to_dict(self):
+        res_js = {"id": self.id,
+                  "email": self.email}
+        res_js.update(self.attributes)
+        return res_js
 
 
 def unwrap(xml):
