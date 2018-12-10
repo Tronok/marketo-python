@@ -19,11 +19,9 @@ For sending data to Marketo, check out https://segment.io.
 setup(
     name='marketo',
     version=VERSION,
-    url='https://github.com/segmentio/marketo-python',
-    author='Ilya Volodarsky',
-    author_email='ilya@segment.io',
-    maintainer='Segment.io',
-    maintainer_email='friends@segment.io',
+    url='https://github.com/tronok/marketo-python',
+    author='Dmitry Kalashnikov',
+    author_email='kalashnikovdm@gmail.com',
     packages=['marketo', 'marketo.wrapper'],
     license='MIT License',
     install_requires=[
