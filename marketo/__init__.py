@@ -1,3 +1,4 @@
+import datetime
 
 import version
 
@@ -7,7 +8,7 @@ __version__ = VERSION
 import requests
 import auth
 
-from marketo.wrapper import get_lead, get_lead_activity, request_campaign, sync_lead
+from marketo.wrapper import get_lead, get_lead_activity, request_campaign, sync_lead, get_multiple_leads
 
 
 class Client:
@@ -49,6 +50,28 @@ class Client:
                 'Accept': '*/*'})
 
         return response
+
+    def get_multiple_leads_last_update_selector(self,
+                                                oldest_updated_at,
+                                                latest_updated_at):
+        if not oldest_updated_at or not isinstance(oldest_updated_at, datetime.datetime):
+            raise ValueError('Must supply oldest_updated_at as a datetime object')
+        if latest_updated_at is not None and not isinstance(latest_updated_at, datetime.datetime):
+            raise ValueError('If latest_updated_at is supplied it must be a datetime object')
+
+        all_leads = []
+        new_stream_position = False
+        first_req = True
+        while new_stream_position or first_req:
+            body = get_multiple_leads.wrap(oldest_updated_at=oldest_updated_at, latest_updated_at=latest_updated_at)
+            response = self.request(body)
+            if response.status_code == 200:
+                new_stream_position, leads = get_lead.unwrap(response)
+                all_leads.extend(leads)
+                first_req = False
+            else:
+                raise Exception(response.text)
+        return all_leads
 
     def get_lead(self, email=None):
 
