@@ -56,8 +56,8 @@ class Client:
                                                 latest_updated_at):
         if not oldest_updated_at or not isinstance(oldest_updated_at, datetime.datetime):
             raise ValueError('Must supply oldest_updated_at as a datetime object')
-        if latest_updated_at is not None and not isinstance(latest_updated_at, datetime.datetime):
-            raise ValueError('If latest_updated_at is supplied it must be a datetime object')
+        if not latest_updated_at and not isinstance(latest_updated_at, datetime.datetime):
+            raise ValueError('Must supply latest_updated_at as a datetime object')
 
         all_leads = []
         new_stream_position = False
