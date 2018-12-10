@@ -61,14 +61,15 @@ class Client:
 
         all_leads = []
         new_stream_position = False
-        first_req = True
-        while new_stream_position or first_req:
-            body = get_multiple_leads.wrap(oldest_updated_at=oldest_updated_at, latest_updated_at=latest_updated_at)
+        remaining_count = 1
+        while remaining_count:
+            body = get_multiple_leads.wrap(oldest_updated_at=oldest_updated_at,
+                                           latest_updated_at=latest_updated_at,
+                                           steam_position=new_stream_position)
             response = self.request(body)
             if response.status_code == 200:
-                new_stream_position, leads = get_lead.unwrap(response)
+                new_stream_position, remaining_count, leads = get_lead.unwrap(response)
                 all_leads.extend(leads)
-                first_req = False
             else:
                 raise Exception(response.text)
         return all_leads

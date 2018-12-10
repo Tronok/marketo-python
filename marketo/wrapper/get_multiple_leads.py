@@ -21,5 +21,6 @@ def wrap(lead_selector="LastUpdateAtSelector", oldest_updated_at=None,
 def unwrap(response):
     root = ET.fromstring(response.text.encode("utf-8"))
     new_position = root.find('.//newStreamPosition').text
+    remaining_count = root.find('.//remainingCount').text
     lead_records_xml = root.findall('.//leadRecord')
-    return new_position, [lead_record.unwrap(lead_record_xml) for lead_record_xml in lead_records_xml]
+    return new_position, remaining_count, [lead_record.unwrap(lead_record_xml) for lead_record_xml in lead_records_xml]
