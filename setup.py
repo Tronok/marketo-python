@@ -17,7 +17,7 @@ For sending data to Marketo, check out https://segment.io.
 '''
 
 setup(
-    name='marketo',
+    name='marketo-tronok',
     version=VERSION,
     url='https://github.com/tronok/marketo-python',
     author='Dmitry Kalashnikov',
