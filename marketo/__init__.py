@@ -7,10 +7,12 @@ __version__ = VERSION
 
 import requests
 from .auth import header
+import xml.etree.ElementTree as ET
 
 from .wrapper import get_lead, get_lead_activity, request_campaign, \
     sync_lead, get_multiple_leads, get_lead_changes
 
+from .exceptions import MktoSoapException, MktoRateLimitExceedException
 
 class Client:
 
@@ -28,6 +30,15 @@ class Client:
         self.soap_endpoint = soap_endpoint
         self.user_id = user_id
         self.encryption_key = encryption_key
+
+    def handle_error(self, response):
+        resp = ET.fromstring(response.text.encode("utf-8"))
+        error_code = int(resp.find(".//code").text)
+        message = resp.find(".//message").text
+        if error_code in (20015, 20023, 20024):
+            raise MktoRateLimitExceedException(error_code=error_code, message=message)
+        else:
+            raise MktoSoapException(error_code=error_code, message=message)
 
     def wrap(self, body):
         return (
@@ -70,7 +81,7 @@ class Client:
                 stream_position, remaining_count, activities = get_lead_changes.unwrap(response, new_stream_position)
                 all_activities.extend(activities)
             else:
-                raise Exception(response.text)
+                self.handle_error(response)
 
     def get_multiple_leads_last_update_selector(self,
                                                 oldest_updated_at,
@@ -91,11 +102,9 @@ class Client:
             if response.status_code == 200:
                 new_stream_position, remaining_count, leads = get_multiple_leads.unwrap(response)
                 remaining_count = int(remaining_count)
-                print("Count " + str(remaining_count))
-                print("Count " + str(new_stream_position))
                 all_leads.extend(leads)
             else:
-                raise Exception(response.text)
+                self.handle_error(response)
         return all_leads
 
     def get_lead(self, email=None):
@@ -108,7 +117,7 @@ class Client:
         if response.status_code == 200:
             return get_lead.unwrap(response)
         else:
-            raise Exception(response.text)
+            self.handle_error(response)
 
     def get_lead_activity(self, email=None, filters=[]):
 
@@ -120,7 +129,7 @@ class Client:
         if response.status_code == 200:
             return get_lead_activity.unwrap(response)
         else:
-            raise Exception(response.text)
+            self.handle_error(response)
 
     def request_campaign(self, campaign=None, lead=None):
 
@@ -136,7 +145,7 @@ class Client:
         if response.status_code == 200:
             return True
         else:
-            raise Exception(response.text)
+            self.handle_error(response)
 
     def sync_lead(self, email=None, attributes=None):
 
@@ -152,4 +161,4 @@ class Client:
         if response.status_code == 200:
             return sync_lead.unwrap(response)
         else:
-            raise Exception(response.text)
+            self.handle_error(response)
