@@ -1,7 +1,7 @@
 
 import xml.etree.ElementTree as ET
 from xml.sax.saxutils import escape
-import lead_record
+from .lead_record import unwrap as lr_unwrap
 
 
 def wrap(email=None, attributes=None):
@@ -28,4 +28,4 @@ def wrap(email=None, attributes=None):
 def unwrap(response):
     root = ET.fromstring(response.text.encode("utf-8"))
     lead_record_xml = root.find('.//leadRecord')
-    return lead_record.unwrap(lead_record_xml)
+    return lr_unwrap(lead_record_xml)

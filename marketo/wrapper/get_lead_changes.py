@@ -1,6 +1,6 @@
 
 import xml.etree.ElementTree as ET
-import lead_activity
+from .lead_activity import unwrap as la_unwrap
 from collections import namedtuple
 # import sys
 # reload(sys)
@@ -33,6 +33,6 @@ def unwrap(response, new_stream_position):
     offset = new_position.find('.//offset').text
     remaining_count = root.find('.//remainingCount').text
     for activity_el in root.findall('.//leadChangeRecord'):
-        activity = lead_activity.unwrap(activity_el)
+        activity = la_unwrap(activity_el)
         activities.append(activity)
     return new_stream_position(latest_created_at, oldest_created_at, offset), remaining_count, activities
