@@ -1,4 +1,4 @@
-from rfc3339 import rfc3339
+from marketo.rfc3339 import rfc3339
 import hmac
 import hashlib
 import datetime
