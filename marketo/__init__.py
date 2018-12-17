@@ -1,15 +1,14 @@
 import datetime
 from collections import namedtuple
 
-import version
+from .version import VERSION
 
-VERSION = version.VERSION
 __version__ = VERSION
 
 import requests
-import auth
+from .auth import header
 
-from marketo.wrapper import get_lead, get_lead_activity, request_campaign, \
+from .wrapper import get_lead, get_lead_activity, request_campaign, \
     sync_lead, get_multiple_leads, get_lead_changes
 
 
@@ -23,8 +22,8 @@ class Client:
         if not user_id or not isinstance(user_id, str):
             raise ValueError('Must supply a user_id as a non empty string.')
 
-        if not encryption_key or not isinstance(encryption_key, str):
-            raise ValueError('Must supply a encryption_key as a non empty string.')
+        if not encryption_key or not isinstance(encryption_key, bytes):
+            raise ValueError('Must supply a encryption_key as a non empty encoded string.')
 
         self.soap_endpoint = soap_endpoint
         self.user_id = user_id
@@ -35,8 +34,8 @@ class Client:
             '<?xml version="1.0" encoding="UTF-8"?>' +
             '<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"' +
                           'xmlns:ns1="http://www.marketo.com/mktows/" ' +
-                          'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '+
-                auth.header(self.user_id, self.encryption_key) +
+                          'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'+
+                header(self.user_id, self.encryption_key) +
                 '<SOAP-ENV:Body>' +
                     body +
                 '</SOAP-ENV:Body>' +
@@ -90,7 +89,10 @@ class Client:
                                            steam_position=new_stream_position)
             response = self.request(body)
             if response.status_code == 200:
-                new_stream_position, remaining_count, leads = get_lead.unwrap(response)
+                new_stream_position, remaining_count, leads = get_multiple_leads.unwrap(response)
+                remaining_count = int(remaining_count)
+                print("Count " + str(remaining_count))
+                print("Count " + str(new_stream_position))
                 all_leads.extend(leads)
             else:
                 raise Exception(response.text)
