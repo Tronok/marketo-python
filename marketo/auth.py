@@ -11,7 +11,8 @@ def sign(message, encryption_key):
 
 def header(user_id, encryption_key):
     timestamp = rfc3339(datetime.datetime.now())
-    signature = sign(timestamp + user_id, encryption_key)
+    msg = timestamp + user_id
+    signature = sign(msg.encode(), encryption_key)
     return (
         '<SOAP-ENV:Header><ns1:AuthenticationHeader>' +
               '<mktowsUserId>' + user_id + '</mktowsUserId>' +
