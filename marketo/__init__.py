@@ -96,6 +96,7 @@ class Client:
         all_leads = []
         new_stream_position = False
         remaining_count = 1
+        number_of_fetched_leads = 0
         while remaining_count:
             body = get_multiple_leads.wrap(oldest_updated_at=oldest_updated_at,
                                            latest_updated_at=latest_updated_at,
@@ -109,12 +110,13 @@ class Client:
                         file_stream.write(json.dumps(lead.to_dict()) + "\n")
                 else:
                     all_leads.extend(leads)
+                number_of_fetched_leads += len(leads)
             else:
                 self.handle_error(response)
         if file_stream is not None:
             file_stream.flush()
-            return file_stream
-        return all_leads
+            return file_stream, number_of_fetched_leads
+        return all_leads, number_of_fetched_leads
 
     def get_lead(self, email=None):
 
