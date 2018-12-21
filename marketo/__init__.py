@@ -1,4 +1,5 @@
 import datetime
+import json
 from collections import namedtuple
 
 from .version import VERSION
@@ -85,7 +86,8 @@ class Client:
 
     def get_multiple_leads_last_update_selector(self,
                                                 oldest_updated_at,
-                                                latest_updated_at):
+                                                latest_updated_at,
+                                                file_stream=None):
         if not oldest_updated_at or not isinstance(oldest_updated_at, datetime.datetime):
             raise ValueError('Must supply oldest_updated_at as a datetime object')
         if not latest_updated_at and not isinstance(latest_updated_at, datetime.datetime):
@@ -102,9 +104,16 @@ class Client:
             if response.status_code == 200:
                 new_stream_position, remaining_count, leads = get_multiple_leads.unwrap(response)
                 remaining_count = int(remaining_count)
-                all_leads.extend(leads)
+                if file_stream is not None:
+                    for lead in leads:
+                        file_stream.write(json.dumps(lead.to_dict()) + "\n")
+                else:
+                    all_leads.extend(leads)
             else:
                 self.handle_error(response)
+        if file_stream is not None:
+            file_stream.flush()
+            return file_stream
         return all_leads
 
     def get_lead(self, email=None):
