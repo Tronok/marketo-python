@@ -17,7 +17,7 @@ from .exceptions import MktoSoapException, MktoRateLimitExceedException
 
 class Client:
 
-    def __init__(self, soap_endpoint=None, user_id=None, encryption_key=None):
+    def __init__(self, soap_endpoint=None, user_id=None, encryption_key=None, rate_limit_checker=None):
 
         if not soap_endpoint or not isinstance(soap_endpoint, str):
             raise ValueError('Must supply a soap_endpoint as a non empty string.')
@@ -31,6 +31,7 @@ class Client:
         self.soap_endpoint = soap_endpoint
         self.user_id = user_id
         self.encryption_key = encryption_key
+        self.rate_limit_checker = rate_limit_checker
 
     def handle_error(self, response):
         resp = ET.fromstring(response.text.encode("utf-8"))
@@ -54,6 +55,8 @@ class Client:
             '</SOAP-ENV:Envelope>')
 
     def request(self, body):
+        if self.rate_limit_checker is not None:
+            self.rate_limit_checker.run(None)
         envelope = self.wrap(body)
         response = requests.post(self.soap_endpoint, data=envelope,
             headers={
